@@ -1,12 +1,14 @@
 from django.db import models
 
 # Create your models here.
-class Promotion(models.Modal):
+class Promotion(models.Model):
      description = models.CharField(max_length=255)
      discount = models.FloatField()
 
 class Collection(models.Model):
     title = models.CharField(max_length=255)
+    featured_product = models.ForeignKey(
+        'Product', on_delete=models.SET_NULL, null=True, related_name='+')
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
@@ -65,7 +67,7 @@ class Address(models.Model):
     customer = models.ForeignKey(
         Customer, on_delete=models.CASCADE)
 
-class Cart(models.Modal):
+class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 class CartItem(models.Model):
