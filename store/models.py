@@ -38,6 +38,13 @@ class Customer(models.Model):
     membership = models.CharField(
         max_length=1, choices=MEMBERSHIP_CHOICES, default=MEMBERSHIP_BRONZE)
 
+    # class Meta:
+    #     db_table = 'store_customers'
+    #     indexes = [
+    #          models.Index(fields=['last_name', 'first_name'])
+    #     ]
+        # unique_together = ['first_name', 'last_name']
+
 class Order(models.Model):
     PAYMENT_PENDING = 'P'
     PAYMENT_COMPLETE = 'C'
