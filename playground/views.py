@@ -9,15 +9,19 @@ def say_hello(request):
     # return render(request, 'hello.html')
 
     # Simple Try/Except block
-    try:
-        product = Product.objects.get(id=-2)
-    except ObjectDoesNotExist:
-        pass
+    # try:
+    #     product = Product.objects.get(id=-2)
+    # except ObjectDoesNotExist:
+    #     pass
 
     # Get all products
     # query_set = Product.objects.all()
     # for product in query_set:
     #     print(product)
 
-    # Return HTML page with name
-    return render(request, 'hello.html', {'name': 'Arslan'})
+    # Filters
+    query_set = Product.objects.filter(unit_price__range=(40, 60))
+    # print(query_set)
+
+    # Render the template with Products
+    return render(request, 'hello.html', {'name': 'Arslan', 'products': list(query_set)})
