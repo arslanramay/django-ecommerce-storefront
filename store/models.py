@@ -10,6 +10,14 @@ class Collection(models.Model):
     featured_product = models.ForeignKey(
         'Product', on_delete=models.SET_NULL, null=True, related_name='+')
 
+    # Return a string representation of the object in Site Admin
+    def __str__(self):
+         return self.title
+
+    # Sort Collection objects by title in ascending order
+    class Meta:
+        ordering = ['title']
+
 class Product(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField()
@@ -19,6 +27,12 @@ class Product(models.Model):
     last_update = models.DateTimeField(auto_now=True)
     collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
     promotions = models.ManyToManyField(Promotion)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        ordering = ['title']
 
 class Customer(models.Model):
     MEMBERSHIP_BRONZE = 'B'
