@@ -53,12 +53,12 @@ class Customer(models.Model):
         max_length=1, choices=MEMBERSHIP_CHOICES, default=MEMBERSHIP_BRONZE)
 
     def __str__(self):
-        return self.first_name
-        # return f'{self.first_name} {self.last_name}'
+        # return self.first_name
+        return f'{self.first_name} {self.last_name}'
 
     class Meta:
-        ordering = ['first_name']
-        # ordering = ['first_name', 'last_name']
+        # ordering = ['first_name']
+        ordering = ['first_name', 'last_name']
 
     # class Meta:
     #     db_table = 'store_customers'
@@ -81,6 +81,9 @@ class Order(models.Model):
         max_length=1,choices=PAYMENT_STATUS_CHOICES, default=PAYMENT_PENDING)
     placed_at = models.DateTimeField(auto_now_add=True)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+
+    # def __str__(self):
+    #     return self.first_name
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.PROTECT)
