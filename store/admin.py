@@ -6,10 +6,17 @@ from . import models
 
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['title', 'unit_price']
+    list_display = ['title', 'unit_price', 'inventory_status']
     list_editable = ['unit_price']
     list_per_page = 15
     search_fields = ['title']
+
+    # Add custom method to display inventory status(computed field)
+    @admin.display(ordering='inventory')
+    def inventory_status(self, product):
+        if product.inventory < 10:
+            return 'Low'
+        return 'OK'
 
 @admin.register(models.Customer)
 class CustomerAdmin(admin.ModelAdmin):
