@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
 from .models import Product
 from .serializers import ProductSerializer
 
@@ -18,4 +19,4 @@ def product_detail(request, id):
         return Response(serializer.data)
         # return Response(f'Product Detail Page: {id}')
     except Product.DoesNotExist:
-        return Response({'error': 'Product not found'}, status=404)
+        return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
