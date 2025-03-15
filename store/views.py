@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from .models import Product
+from .serializers import ProductSerializer
 
 # Define API Views
 @api_view()
@@ -10,4 +12,10 @@ def product_list(request):
 
 @api_view()
 def product_detail(request, id):
-    return Response(f'Product Detail Page: {id}')
+    try:
+        product = Product.objects.get(pk=id)
+        serializer = ProductSerializer(product)
+        return Response(serializer.data)
+        # return Response(f'Product Detail Page: {id}')
+    except Product.DoesNotExist:
+        return Response({'error': 'Product not found'}, status=404)
