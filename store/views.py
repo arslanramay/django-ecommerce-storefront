@@ -22,7 +22,6 @@ def product_detail(request, id):
 
 
 
-
 # Without get_obj_or_404
 # def product_detail(request, id):
 #     try:
