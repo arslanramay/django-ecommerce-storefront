@@ -9,14 +9,20 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
 # Define API Views
-@api_view()
+@api_view(['GET', 'POST'])
 def product_list(request):
-    # products = quertyset
-    # products = Product.objects.all()
-    products = Product.objects.select_related('collection').all() # select_related for joining tables
+    if request.method == 'GET':
+        products = Product.objects.select_related('collection').all() # select_related for joining tables
+        serializer = ProductSerializer(products, many=True, context={'request': request}) # many=True for iterating on multiple objects
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        serializer = ProductSerializer(data=request.data)
+        return Response('OK')
+        # return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # if serializer.is_valid():
+        #     serializer.save()
+        #     return Response(serializer.data)
 
-    serializer = ProductSerializer(products, many=True, context={'request': request}) # many=True for iterating on multiple objects
-    return Response(serializer.data)
 
 @api_view()
 def product_detail(request, id):
