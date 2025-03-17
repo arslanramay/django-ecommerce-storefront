@@ -15,7 +15,7 @@ def product_list(request):
     # products = Product.objects.all()
     products = Product.objects.select_related('collection').all() # select_related for joining tables
 
-    serializer = ProductSerializer(products, many=True) # many=True for iterating on multiple objects
+    serializer = ProductSerializer(products, many=True, context={'request': request}) # many=True for iterating on multiple objects
     return Response(serializer.data)
 
 @api_view()
@@ -23,6 +23,10 @@ def product_detail(request, id):
     product = get_object_or_404(Product, pk=id)
     serializer = ProductSerializer(product)
     return Response(serializer.data)
+
+@api_view()
+def collection_detail(request, pk):
+    return Response(f'Collection Detail Page: {pk}')
 
 
 
