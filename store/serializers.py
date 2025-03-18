@@ -15,27 +15,38 @@ class CollectionSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'title', 'unit_price', 'price_with_tax', 'collection']
+        fields = ['id', 'title', 'slug', 'inventory', 'unit_price', 'price_with_tax', 'collection']
     # id = serializers.IntegerField()
     # title = serializers.CharField(max_length=255)
     # description = serializers.CharField()
     # price = serializers.DecimalField(max_digits=6, decimal_places=2, source='unit_price')
-    price_with_tax = serializers.SerializerMethodField(method_name='get_price_with_tax')
+    price_with_tax = serializers.SerializerMethodField(
+        method_name='calculate_tax')
 
     # Fetch related Collection object
     # 1. Primary key:: This will return Collection IDs only
-    # collection = serializers.PrimaryKeyRelatedField(
-    #     queryset=Collection.objects.all()
-    # )
+    collection = serializers.PrimaryKeyRelatedField(queryset=Collection.objects.all())
+
     # 2. String:: This will return Collection Titles (1000 extra SQL queries)
     # collection = serializers.StringRelatedField()
+
     # 3. Nested Object:: This will return Nested Collection object (1 extra SQL query)
     # collection = CollectionSerializer()
-    # 4. Hyperlink:: Return Hyper Links
-    collection = serializers.HyperlinkedRelatedField(
-        queryset=Collection.objects.all(),
-        view_name='collection-detail'
-    )
 
-    def get_price_with_tax(self, product : Product):
+    # 4. Hyperlink:: Return Hyper Links
+    # collection = serializers.HyperlinkedRelatedField(
+    #     queryset=Collection.objects.all(),
+    #     view_name='collection-detail'
+    # )
+
+    def calculate_tax(self, product : Product):
         return product.unit_price * Decimal('1.1')
+
+    def create(self, validated_data):
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        # instance.unit_price = validated_data.get('unit_price')
+        # instance.save()
+        # return instance
+        return super().update(instance, validated_data)
