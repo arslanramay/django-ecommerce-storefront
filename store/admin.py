@@ -1,9 +1,12 @@
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.db.models.aggregates import Count
+from django.db.models.query import QuerySet
+from django.utils.html import format_html, urlencode
+from django.urls import reverse
 from . import models
 # from .models import Product, Collection
 
 # Register Models for Admin Site
-
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['title', 'unit_price', 'inventory_status', 'collection_title']
@@ -23,6 +26,27 @@ class ProductAdmin(admin.ModelAdmin):
             return 'Low'
         return 'OK'
 
+@admin.register(models.Collection)
+class CollectionAdmin(admin.ModelAdmin):
+    autocomplete_fields = ['featured_product']
+    list_display = ['title', 'products_count']
+    search_fields = ['title']
+
+    @admin.display(ordering='products_count')
+    def products_count(self, collection):
+        url = (
+            reverse('admin:store_product_changelist')
+            + '?'
+            + urlencode({
+                'collection__id': str(collection.id)
+            }))
+        return format_html('<a href="{}">{} Products</a>', url, collection.products_count)
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(
+            products_count=Count('products')
+        )
+
 @admin.register(models.Customer)
 class CustomerAdmin(admin.ModelAdmin):
     list_display = ['first_name', 'last_name', 'membership']
@@ -36,6 +60,6 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'placed_at', 'payment_status', 'customer']
 
 # admin.site.register(models.Product, ProductAdmin)
-admin.site.register(models.Collection)
+# admin.site.register(models.Collection)
 # admin.site.register(models.Order)
 # admin.site.register(models.Customer)
