@@ -7,6 +7,7 @@ from . import models
 # from .models import Product, Collection
 
 # Register Models for Admin Site
+# Product Admin
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['title', 'unit_price', 'inventory_status', 'collection_title']
@@ -26,6 +27,7 @@ class ProductAdmin(admin.ModelAdmin):
             return 'Low'
         return 'OK'
 
+# Collection Admin
 @admin.register(models.Collection)
 class CollectionAdmin(admin.ModelAdmin):
     autocomplete_fields = ['featured_product']
@@ -47,6 +49,7 @@ class CollectionAdmin(admin.ModelAdmin):
             products_count=Count('products')
         )
 
+# Customer Admin
 @admin.register(models.Customer)
 class CustomerAdmin(admin.ModelAdmin):
     list_display = ['first_name', 'last_name', 'membership']
@@ -55,6 +58,7 @@ class CustomerAdmin(admin.ModelAdmin):
     ordering = ['first_name', 'last_name']
     search_fields = ['first_name', 'last_name']
 
+# Order Admin
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'placed_at', 'payment_status', 'customer']
