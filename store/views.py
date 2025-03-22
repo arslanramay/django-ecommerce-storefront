@@ -23,6 +23,10 @@ class ProductList(ListCreateAPIView):
     def get_serializer_context(self):
         return {'request': self.request}
 
+class CollectionList(ListCreateAPIView):
+    queryset = Collection.objects.annotate(products_count=Count('products')).all()
+    serializer_class = CollectionSerializer
+
 # ======================
 # Class Based API Views
 # ======================
@@ -62,17 +66,17 @@ class ProductDetail(APIView):
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class CollectionList(APIView):
-    def get(self, request):
-        collections = Collection.objects.annotate(products_count=Count('products')).all()
-        serializer = CollectionSerializer(collections, many=True)
-        return Response(serializer.data)
+# class CollectionList(APIView):
+#     def get(self, request):
+#         collections = Collection.objects.annotate(products_count=Count('products')).all()
+#         serializer = CollectionSerializer(collections, many=True)
+#         return Response(serializer.data)
 
-    def post(self, request):
-        serializer = CollectionSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+#     def post(self, request):
+#         serializer = CollectionSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class CollectionDetail(APIView):
     def get(self, request, pk):
