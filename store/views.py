@@ -2,6 +2,8 @@ from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 
+from rest_framework.generics import ListCreateAPIView
+from rest_framework.mixins import ListModelMixin, CreateModelMixin
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -13,7 +15,8 @@ from .serializers import ProductSerializer, CollectionSerializer
 # ======================
 # Class Based API Views
 # ======================
-class ProductList(APIView):
+class ProductList(ListCreateAPIView):
+
     def get(self, request):
         products = Product.objects.select_related('collection').all() # select_related for joining tables
         serializer = ProductSerializer(products, many=True, context={'request': request}) # many=True for iterating on multiple objects
@@ -50,9 +53,9 @@ class ProductDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# ==================
-# Product API Views
-# ==================
+# ==========================
+# Function Based API Views
+# ==========================
 # @api_view(['GET', 'POST'])
 # def product_list(request):
 #     if request.method == 'GET':
