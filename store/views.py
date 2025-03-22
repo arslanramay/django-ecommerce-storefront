@@ -26,10 +26,10 @@ class ProductList(ListCreateAPIView):
 class ProductDetail(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    lookup_field = 'id'
+    # lookup_field = 'id' # set <int:pk> as lookup field in urls.py
 
-    def delete(self, request, *args, **kwargs):
-        product = self.get_object()
+    def delete(self, request, pk):
+        product = get_object_or_404(Product, pk=pk)
         if product.orderitems.count() > 0:
             return Response(
                 {
@@ -42,6 +42,21 @@ class ProductDetail(RetrieveUpdateDestroyAPIView):
 class CollectionList(ListCreateAPIView):
     queryset = Collection.objects.annotate(products_count=Count('products')).all()
     serializer_class = CollectionSerializer
+
+class CollectionDetail(RetrieveUpdateDestroyAPIView):
+    queryset = Collection.objects.annotate(products_count=Count('products')).all()
+    serializer_class = CollectionSerializer
+
+    def delete(self, request, pk):
+        collection = get_object_or_404(Collection, pk=pk)
+        if collection.products.count() > 0:
+            return Response(
+                {
+                    'error': 'Collection cannot be deleted because it includes one or more products.'
+                },
+                status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        collection.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 # ======================
 # Class Based API Views
@@ -94,29 +109,29 @@ class CollectionList(ListCreateAPIView):
 #         serializer.save()
 #         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-class CollectionDetail(APIView):
-    def get(self, request, pk):
-        collection = get_object_or_404(Collection.objects.annotate(products_count=Count('products')), pk=pk)
-        serializer = CollectionSerializer(collection)
-        return Response(serializer.data)
+# class CollectionDetail(APIView):
+#     def get(self, request, pk):
+#         collection = get_object_or_404(Collection.objects.annotate(products_count=Count('products')), pk=pk)
+#         serializer = CollectionSerializer(collection)
+#         return Response(serializer.data)
 
-    def put(self, request, pk):
-        collection = get_object_or_404(Collection, pk=pk)
-        serializer = CollectionSerializer(collection, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+#     def put(self, request, pk):
+#         collection = get_object_or_404(Collection, pk=pk)
+#         serializer = CollectionSerializer(collection, data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response(serializer.data)
 
-    def delete(self, request, pk):
-        collection = get_object_or_404(Collection, pk=pk)
-        if collection.products.count() > 0:
-            return Response(
-                {
-                    'error': 'Collection cannot be deleted because it includes one or more products.'
-                },
-                status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        collection.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+#     def delete(self, request, pk):
+#         collection = get_object_or_404(Collection, pk=pk)
+#         if collection.products.count() > 0:
+#             return Response(
+#                 {
+#                     'error': 'Collection cannot be deleted because it includes one or more products.'
+#                 },
+#                 status=status.HTTP_405_METHOD_NOT_ALLOWED)
+#         collection.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
 
 # ==========================
 # Function Based API Views

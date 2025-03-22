@@ -9,7 +9,7 @@ urlpatterns = [
 
     # Class based views
     path('products/', views.ProductList.as_view()),
-    path('products/<int:id>/', views.ProductDetail.as_view()),
+    path('products/<int:pk>/', views.ProductDetail.as_view()),
 
     # Function based views
     # path('collections/', views.collection_list),
