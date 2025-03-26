@@ -62,8 +62,20 @@ class ReviewSerializer(serializers.ModelSerializer):
         product_id = self.context['product_id']
         return Review.objects.create(product_id= product_id, **validated_data)
 
+class SimpleProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'unit_price']
+
+class CartItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'quantity']
+
 class CartSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only=True)
+    items = CartItemSerializer(many=True) # This will return a list of CartItem objects
     class Meta:
         model = Cart
-        fields = ['id']
+        fields = ['id', 'items']
