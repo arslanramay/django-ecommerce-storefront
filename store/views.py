@@ -80,8 +80,12 @@ class ReviewViewSet(ModelViewSet):
     def get_serializer_context(self):
         return {'product_id': self.kwargs['product_pk']}
 
-class CartViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
-    queryset = Cart.objects.all()
+class CartViewSet(CreateModelMixin,
+                    RetrieveModelMixin,
+                    DestroyModelMixin,
+                    GenericViewSet):
+    # queryset = Cart.objects.all()
+    queryset = Cart.objects.prefetch_related('items__product').all()
     serializer_class = CartSerializer
 
 
