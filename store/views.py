@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from .models import Product, Collection, OrderItem, Review, Cart, CartItem
-from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer, CartSerializer, CartItemSerializer
+from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer
 
 # ======================
 #       ViewSets
@@ -90,14 +90,24 @@ class CartViewSet(CreateModelMixin,
 
 
 class CartItemViewSet(ModelViewSet):
-    # http_method_names = ['get', 'post', 'patch', 'delete']
     # queryset = CartItem.objects.all()
-    serializer_class = CartItemSerializer
+    # serializer_class = CartItemSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return AddCartItemSerializer
+        return CartItemSerializer
+
+    # Pass additional context to serializer
+    def get_serializer_context(self):
+        return {'cart_id': self.kwargs['cart_pk']}
 
     # Filter cart items based on cart_id
     def get_queryset(self):
         # return CartItem.objects.filter(cart_id=self.kwargs['cart_pk']) # Extra SQl queries
         return CartItem.objects.filter(cart_id=self.kwargs['cart_pk']).select_related('product')
+
+
 
 
 # ========================================================================================
