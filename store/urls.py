@@ -13,8 +13,15 @@ router.register('carts', views.CartViewSet)
 products_router = routers.NestedDefaultRouter(router, 'products', lookup='product')
 products_router.register('reviews', views.ReviewViewSet, basename='product-reviews')
 
+#lookup='cart_pk' provides the URL parameter which we retrieve in the CartItemViewSet with kwargs['cart_pk']
+# carts_router = routers.NestedDefaultRouter(router, 'carts', lookup='cart_pk')
+carts_router = routers.NestedDefaultRouter(router, 'carts', lookup='cart')
+carts_router.register('items', views.CartItemViewSet, basename='cart-items')
+# carts_router.register('items', views.CartItemViewSet, basename='cart-items-list')
+# carts_router.register('items', views.CartItemViewSet, basename='cart-items-detail')
+
 # Combine Router URLs i.e Default and Nested Router URLs
-urlpatterns = router.urls + products_router.urls
+urlpatterns = router.urls + products_router.urls + carts_router.urls
 
 
 
