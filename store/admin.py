@@ -55,7 +55,8 @@ class CustomerAdmin(admin.ModelAdmin):
     list_display = ['first_name', 'last_name', 'membership']
     list_editable = ['membership']
     list_per_page = 15
-    ordering = ['first_name', 'last_name']
+    list_select_related = ['user'] # Eager load users to reduce the number of queries
+    ordering = ['user__first_name', 'user__last_name']
     search_fields = ['first_name', 'last_name']
 
 # Order Admin
