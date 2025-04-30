@@ -52,7 +52,7 @@ class CollectionAdmin(admin.ModelAdmin):
 # Customer Admin
 @admin.register(models.Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name', 'membership']
+    list_display = ['first_name', 'last_name', 'membership'] # Override this in Customer Model
     list_editable = ['membership']
     list_per_page = 15
     list_select_related = ['user'] # Eager load users to reduce the number of queries
