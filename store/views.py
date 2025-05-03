@@ -4,7 +4,7 @@ from django.http import HttpResponse
 
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -114,6 +114,26 @@ class CartItemViewSet(ModelViewSet):
 class CusdtomerViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+
+    @action(detail=False, methods=['GET', 'PUT'])
+    def me(self, request):
+        # customer = Customer.objects.get_or_create(user_id=request.user.id) # Get the customer object based on the user id
+        # Above line will only return a Tuple with 2 values
+
+        # Unpack the tuple to get the customer object
+        (customer, created) = Customer.objects.get_or_create(user_id=request.user.id) # Get the customer object based on the user id
+        if request.method == 'GET':
+            serializer = CustomerSerializer(customer)
+            return Response(serializer.data)
+            # return Response(request.user.id)
+        elif request.method == 'PUT':
+            serializer = CustomerSerializer(customer, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+
+
+
 
 # ========================================================================================
 # Generic API Views
