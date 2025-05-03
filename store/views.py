@@ -5,7 +5,8 @@ from django.http import HttpResponse
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.decorators import api_view, action
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
+from .permissions import IsAdminOrReadOnly
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -20,6 +21,7 @@ from .serializers import ProductSerializer, CollectionSerializer, CustomerSerial
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [IsAdminOrReadOnly] # Only admin users can edit products
 
     def get_serializer_context(self):
         return {'request': self.request}
@@ -48,6 +50,7 @@ class ProductViewSet(ModelViewSet):
 class CollectionViewSet(ModelViewSet):
     queryset = Collection.objects.annotate(products_count=Count('products')).all()
     serializer_class = CollectionSerializer
+    permission_classes = [IsAdminOrReadOnly] # Only admin users can edit products
 
     def destroy(self, request, *args, **kwargs):
         if Product.objects.filter(collection_id=kwargs['pk']).count() > 0:
@@ -112,20 +115,27 @@ class CartItemViewSet(ModelViewSet):
         return CartItem.objects.filter(cart_id=self.kwargs['cart_pk']).select_related('product')
 
 
-class CusdtomerViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
+# class CusdtomerViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
+class CusdtomerViewSet(ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
-    permission_classes = [IsAuthenticated] # Only authenticated users can access this view
+    # permission_classes = [IsAuthenticated] # Only authenticated users can access this view
+    permission_classes = [IsAdminUser]
 
-    # Override the get_permissions method to set permissions based on request method
-    # GET is allowed by anyone
-    # PUT is allowed only for authenticated users
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return [AllowAny()]
-        return [IsAuthenticated()]
+    """
+    Override the get_permissions method to set permissions based on request method
+    GET is allowed by anyone
+    PUT is allowed only for authenticated users
+    """
+    # def get_permissions(self):
+    #     if self.request.method == 'GET':
+    #         return [AllowAny()]
+    #     return [IsAuthenticated()]
 
-    @action(detail=False, methods=['GET', 'PUT'])
+    """
+    Override the 'me' method below and apply the permissions
+    """
+    @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
     def me(self, request):
         # customer = Customer.objects.get_or_create(user_id=request.user.id) # Get the customer object based on the user id
         # Above line will only return a Tuple with 2 values
