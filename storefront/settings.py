@@ -158,24 +158,21 @@ REST_FRAMEWORK = {
     # 'PAGE_SIZE': 10,
 }
 
-SIMPLE_JWT = {
-   'AUTH_HEADER_TYPES': ('JWT',),
-}
-
 AUTH_USER_MODEL = 'core.User'
 
 DJOSER = {
     # 'LOGIN_FIELD': 'email',
     'SERIALIZERS': {
-        'user_create': 'core.serializers.UserCreateSerializer',
         # 'user': 'core.serializers.UserSerializer',
-        # 'current_user': 'core.serializers.UserSerializer',
+        'user_create': 'core.serializers.UserCreateSerializer',
+        'current_user': 'core.serializers.UserSerializer',
     },
     # 'ACTIVATION_URL': 'activate/{uid}/{token}',
     # 'SEND_ACTIVATION_EMAIL': True,
 }
 
 SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('JWT',),
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     # "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
