@@ -12,8 +12,8 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
-from .models import Product, Collection, Customer, OrderItem, Review, Cart, CartItem
-from .serializers import ProductSerializer, CollectionSerializer, CustomerSerializer, ReviewSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer
+from .models import Product, Collection, Customer, Order, OrderItem, Review, Cart, CartItem
+from .serializers import ProductSerializer, CollectionSerializer, CustomerSerializer, ReviewSerializer, CartSerializer, OrderSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer
 
 # ======================
 #       ViewSets
@@ -151,6 +151,17 @@ class CusdtomerViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+
+
+class OrderViewSet(ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+    # def get_queryset(self):
+    #     return OrderItem.objects.filter(product_id=self.kwargs['product_pk'])
+
+    # def get_serializer_context(self):
+    #     return {'product_id': self.kwargs['product_pk']}
 
 
 
