@@ -154,8 +154,20 @@ class CusdtomerViewSet(ModelViewSet):
 
 
 class OrderViewSet(ModelViewSet):
-    queryset = Order.objects.all()
+    # queryset = Order.objects.all() # This will return all the Orders
     serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            # If the user is an admin, return all orders
+            return Order.objects.all()
+        # If the user is not an admin, return only the orders for the logged-in user
+        # Filter orders based on customer_id
+        customer_id = Customer.objects.only('id').get(user_id=user.id)
+        # return customer_id
+        return Order.objects.filter(customer_id=customer_id)
 
     # def get_queryset(self):
     #     return OrderItem.objects.filter(product_id=self.kwargs['product_pk'])
