@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from .models import Product, Collection, Customer, Order, OrderItem, Review, Cart, CartItem
-from .serializers import ProductSerializer, CollectionSerializer, CustomerSerializer, ReviewSerializer, CartSerializer, OrderSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer
+from .serializers import ProductSerializer, CollectionSerializer, CustomerSerializer, ReviewSerializer, CartSerializer, OrderSerializer, CreateOrderSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer
 
 # ======================
 #       ViewSets
@@ -155,8 +155,17 @@ class CusdtomerViewSet(ModelViewSet):
 
 class OrderViewSet(ModelViewSet):
     # queryset = Order.objects.all() # This will return all the Orders
-    serializer_class = OrderSerializer
+    # serializer_class = OrderSerializer # Override this below
     permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateOrderSerializer
+        return OrderSerializer
+
+    # Pass additional context to serializer
+    def get_serializer_context(self):
+        return {'user_id': self.request.user.id}
 
     def get_queryset(self):
         user = self.request.user
