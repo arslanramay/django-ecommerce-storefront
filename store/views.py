@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from .models import Product, Collection, Customer, Order, OrderItem, Review, Cart, CartItem
-from .serializers import ProductSerializer, CollectionSerializer, CustomerSerializer, ReviewSerializer, CartSerializer, OrderSerializer, CreateOrderSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer
+from .serializers import ProductSerializer, CollectionSerializer, CustomerSerializer, ReviewSerializer, CartSerializer, OrderSerializer, CreateOrderSerializer, UpdateOrderSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer
 
 # ======================
 #       ViewSets
@@ -154,9 +154,15 @@ class CusdtomerViewSet(ModelViewSet):
 
 
 class OrderViewSet(ModelViewSet):
+    http_method_names = ['get', 'patch', 'delete', 'head', 'options']
     # queryset = Order.objects.all() # This will return all the Orders
     # serializer_class = OrderSerializer # Override this below
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated] # Replace this with the below method
+
+    def get_permissions(self):
+        if self.request.method in ['PATCH', 'DELETE']:
+            return [IsAdminUser()]
+        return [IsAuthenticated()]
 
     # Override the create method so that w ecan return 'order' object
     def create(self, request, *args, **kwargs):
@@ -172,6 +178,8 @@ class OrderViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return CreateOrderSerializer
+        elif self.request.method == 'PATCH':
+            return UpdateOrderSerializer
         return OrderSerializer
 
     # Pass additional context to serializer

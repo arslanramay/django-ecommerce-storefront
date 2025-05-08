@@ -148,9 +148,20 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ['id', 'customer', 'placed_at', 'payment_status', 'items']
 
+class UpdateOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['payment_status']
+
+    # def validate_payment_status(self, value):
+    #     if value not in [Order.PAYMENT_PENDING, Order.PAYMENT_COMPLETE]:
+    #         raise serializers.ValidationError('Invalid payment status.')
+    #     return value
+
 class CreateOrderSerializer(serializers.Serializer):
     cart_id = serializers.UUIDField()
 
+    # Validate the cart_id to check if Cart exists and is not empty
     def validate_cart_id(self, cart_id):
         if not Cart.objects.filter(pk=cart_id).exists():
             raise serializers.ValidationError('No cart with the given ID.')
