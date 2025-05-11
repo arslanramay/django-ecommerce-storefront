@@ -12,8 +12,8 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
-from .models import Product, Collection, Customer, OrderItem, Review, Cart, CartItem
-from .serializers import ProductSerializer, CollectionSerializer, CustomerSerializer, ReviewSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer
+from .models import Product, Collection, Customer, Order, OrderItem, Review, Cart, CartItem
+from .serializers import ProductSerializer, CollectionSerializer, CustomerSerializer, ReviewSerializer, CartSerializer, OrderSerializer, CreateOrderSerializer, UpdateOrderSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer
 
 # ======================
 #       ViewSets
@@ -151,6 +151,52 @@ class CusdtomerViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+
+
+class OrderViewSet(ModelViewSet):
+    http_method_names = ['get', 'patch', 'delete', 'head', 'options']
+    # queryset = Order.objects.all() # This will return all the Orders
+    # serializer_class = OrderSerializer # Override this below
+    permission_classes = [IsAuthenticated] # Replace this with the below method
+
+    def get_permissions(self):
+        if self.request.method in ['PATCH', 'DELETE']:
+            return [IsAdminUser()]
+        return [IsAuthenticated()]
+
+    # Override the create method so that w ecan return 'order' object
+    def create(self, request, *args, **kwargs):
+        serializer = CreateOrderSerializer(
+            data=request.data,
+            context={'user_id': request.user.id}
+        )
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        serializer = OrderSerializer(order)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateOrderSerializer
+        elif self.request.method == 'PATCH':
+            return UpdateOrderSerializer
+        return OrderSerializer
+
+    # Pass additional context to serializer
+    # This is not needed as we are passing the context in the create method
+    # def get_serializer_context(self):
+    #     return {'user_id': self.request.user.id}
+
+    def get_queryset(self):
+        user = self.request.user
+
+        # If the user is an admin, return all orders
+        if user.is_staff:
+            return Order.objects.all()
+        # If the user is not an admin, return only the orders for the logged-in user
+        # Filter orders based on customer_id
+        customer_id = Customer.objects.only('id').get(user_id=user.id)
+        return Order.objects.filter(customer_id=customer_id)
 
 
 
