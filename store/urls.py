@@ -14,6 +14,7 @@ router.register('orders', views.OrderViewSet, basename='orders')
 
 products_router = routers.NestedDefaultRouter(router, 'products', lookup='product')
 products_router.register('reviews', views.ReviewViewSet, basename='product-reviews')
+products_router.register('images', views.ProductImageViewSet, basename='product-images')
 
 #lookup='cart_pk' provides the URL parameter which we retrieve in the CartItemViewSet with kwargs['cart_pk']
 # carts_router = routers.NestedDefaultRouter(router, 'carts', lookup='cart_pk')

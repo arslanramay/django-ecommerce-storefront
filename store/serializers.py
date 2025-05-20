@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.db import transaction
 from decimal import Decimal
-from .models import Product, Collection, Customer, Order, OrderItem, Review, Cart, CartItem
+from .models import Product, ProductImage, Collection, Customer, Order, OrderItem, Review, Cart, CartItem
 
 class CollectionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -52,6 +52,11 @@ class ProductSerializer(serializers.ModelSerializer):
         # instance.save()
         # return instance
         return super().update(instance, validated_data)
+
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ['id', 'image']
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:

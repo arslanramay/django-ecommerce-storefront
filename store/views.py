@@ -12,8 +12,8 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
-from .models import Product, Collection, Customer, Order, OrderItem, Review, Cart, CartItem
-from .serializers import ProductSerializer, CollectionSerializer, CustomerSerializer, ReviewSerializer, CartSerializer, OrderSerializer, CreateOrderSerializer, UpdateOrderSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer
+from .models import Product, ProductImage, Collection, Customer, Order, OrderItem, Review, Cart, CartItem
+from .serializers import ProductSerializer, ProductImageSerializer, CollectionSerializer, CustomerSerializer, ReviewSerializer, CartSerializer, OrderSerializer, CreateOrderSerializer, UpdateOrderSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer
 
 # ======================
 #       ViewSets
@@ -49,6 +49,26 @@ class ProductViewSet(ModelViewSet):
     #             status=status.HTTP_405_METHOD_NOT_ALLOWED)
     #     product.delete()
     #     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+"""
+    URL: /api/products/<int:product_pk>/images/
+    This will return all the images for a specific product
+
+    URL: /api/products/<int:product_pk>/images/<int:pk>/
+    This will return a specific image for a specific product
+"""
+class ProductImageViewSet(ModelViewSet):
+    # queryset = Product.objects.all() # Override this in the get_queryset method
+    serializer_class = ProductImageSerializer
+    # permission_classes = [IsAdminOrReadOnly] # Only admin users can edit products
+
+    def get_queryset(self):
+        return ProductImage.objects.filter(product_id=self.kwargs['product_pk'])
+
+    # def get_serializer_context(self):
+    #     return {'product_id': self.kwargs['product_pk']}
+
 
 class CollectionViewSet(ModelViewSet):
     queryset = Collection.objects.annotate(products_count=Count('products')).all()
