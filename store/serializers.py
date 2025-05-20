@@ -54,6 +54,13 @@ class ProductSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 class ProductImageSerializer(serializers.ModelSerializer):
+    """
+    Override the default create method to set the product_id while creating a new ProductImage
+    """
+    def create(self, validated_data):
+        product_id = self.context['product_id']
+        return ProductImage.objects.create(product_id=product_id, **validated_data)
+
     class Meta:
         model = ProductImage
         fields = ['id', 'image']
